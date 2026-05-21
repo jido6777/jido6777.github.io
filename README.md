@@ -1,4 +1,4 @@
-# jido6777 — Portfolio
+# Portfolio
 
 > *Personal portfolio site. Cyberpunk aesthetic. Pure HTML, CSS and vanilla JS. No frameworks, no dependencies, no trace.*
 
