@@ -1,4 +1,4 @@
-# jido6777 — NETRUNNER // NIGHT CITY
+# jido6777 — Portfolio
 
 > *Personal portfolio site. Cyberpunk aesthetic. Pure HTML, CSS and vanilla JS. No frameworks, no dependencies, no trace.*
 
