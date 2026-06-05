@@ -2189,6 +2189,158 @@
     60%  { opacity: 0.4; clip-path: inset(0 0 0 0); transform: translateX(0); }
     100% { opacity: 0; }
   }
+  /* ─── GHOST CARDS — efecto cuando el video está activo ─── */
+
+  /* Cuando el video entra, las cards de otras secciones se vuelven fantasmas */
+  #contact-wrapper.video-active ~ * .skill-card,
+  #contact-wrapper.video-active ~ * .project-card,
+  #contact-wrapper.video-active ~ * .lang-chip,
+  #contact-wrapper.video-active ~ * .stat-box {
+    /* No aplica porque las secciones están ANTES del contact-wrapper */
+    /* El selector correcto es via body class */
+  }
+
+  /* Usamos una clase en body que JS activa cuando el video arranca */
+  body.video-mode .skill-card,
+  body.video-mode .project-card,
+  body.video-mode .lang-chip,
+  body.video-mode .stat-box {
+    opacity: 0.04;
+    border-color: rgba(252, 227, 0, 0.03) !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    transition:
+      opacity 1.2s ease,
+      border-color 1.2s ease,
+      background 1.2s ease,
+      box-shadow 1.2s ease,
+      transform 0.3s ease,
+      filter 0.3s ease;
+    filter: blur(0.5px);
+  }
+
+  /* Hover sobre cards fantasma: revelan su contorno con efecto scan */
+  body.video-mode .skill-card:hover,
+  body.video-mode .project-card:hover,
+  body.video-mode .lang-chip:hover,
+  body.video-mode .stat-box:hover {
+    opacity: 0.22;
+    border-color: rgba(252, 227, 0, 0.25) !important;
+    background: rgba(5, 8, 15, 0.12) !important;
+    box-shadow: 0 0 18px rgba(0, 238, 255, 0.08), inset 0 0 20px rgba(0, 238, 255, 0.03) !important;
+    transform: translateY(-2px) scale(1.01);
+    filter: blur(0px);
+    animation: ghostPulse 2.5s ease-in-out infinite;
+  }
+
+  body.video-mode .project-card:hover {
+    transform: translateX(4px) scale(1.005);
+  }
+
+  /* Pseudo-elemento scan line al hacer hover */
+  body.video-mode .skill-card,
+  body.video-mode .project-card,
+  body.video-mode .lang-chip,
+  body.video-mode .stat-box {
+    overflow: hidden;
+  }
+
+  body.video-mode .skill-card::after,
+  body.video-mode .project-card::after,
+  body.video-mode .stat-box::after {
+    content: '';
+    position: absolute;
+    left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(0, 238, 255, 0.6), transparent);
+    top: -100%;
+    opacity: 0;
+    pointer-events: none;
+    transition: none;
+  }
+
+  body.video-mode .skill-card:hover::after,
+  body.video-mode .project-card:hover::after,
+  body.video-mode .stat-box:hover::after {
+    animation: ghostScan 1.4s ease-in-out infinite;
+    opacity: 1;
+  }
+
+  /* Lang chip tiene clip-path que bloquea el after, usamos before */
+  body.video-mode .lang-chip::before {
+    content: '';
+    position: absolute;
+    left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(0, 238, 255, 0.5), transparent);
+    top: -100%;
+    opacity: 0;
+    pointer-events: none;
+    z-index: 5;
+    transition: none;
+  }
+
+  body.video-mode .lang-chip:hover::before {
+    animation: ghostScan 1.4s ease-in-out infinite;
+    opacity: 1;
+  }
+
+  @keyframes ghostScan {
+    0%   { top: -5%; }
+    100% { top: 110%; }
+  }
+
+  @keyframes ghostPulse {
+    0%, 100% {
+      box-shadow: 0 0 14px rgba(0, 238, 255, 0.06), inset 0 0 16px rgba(0, 238, 255, 0.02) !important;
+    }
+    50% {
+      box-shadow: 0 0 28px rgba(0, 238, 255, 0.14), inset 0 0 30px rgba(0, 238, 255, 0.06) !important;
+    }
+  }
+
+  /* Corner brackets fantasma en hover */
+  body.video-mode .skill-card:hover,
+  body.video-mode .project-card:hover,
+  body.video-mode .stat-box:hover,
+  body.video-mode .lang-chip:hover {
+    outline: none;
+  }
+
+  /* El texto dentro de las cards también se vuelve casi invisible */
+  body.video-mode .skill-card *,
+  body.video-mode .project-card *,
+  body.video-mode .lang-chip *,
+  body.video-mode .stat-box * {
+    opacity: 0.5;
+    transition: opacity 0.4s ease;
+  }
+
+  body.video-mode .skill-card:hover *,
+  body.video-mode .project-card:hover *,
+  body.video-mode .lang-chip:hover *,
+  body.video-mode .stat-box:hover * {
+    opacity: 1;
+  }
+
+  /* Cuando el video termina, restaurar todo */
+  body.video-mode.video-ended .skill-card,
+  body.video-mode.video-ended .project-card,
+  body.video-mode.video-ended .lang-chip,
+  body.video-mode.video-ended .stat-box {
+    opacity: 1;
+    filter: none;
+    transition: opacity 1.8s ease, filter 1.8s ease, border-color 1.8s ease;
+  }
+
+  body.video-mode.video-ended .skill-card *,
+  body.video-mode.video-ended .project-card *,
+  body.video-mode.video-ended .lang-chip *,
+  body.video-mode.video-ended .stat-box * {
+    opacity: 1;
+    transition: opacity 1.8s ease;
+  }
+
   /* ─── FREELANCE CALLOUT ─── */
   #freelance-callout {
     margin-top: 2.5rem;
@@ -3121,6 +3273,7 @@
     function triggerContactReveal() {
       contactVideo.classList.add('ended');
       progressBar.style.transition = '';
+      document.body.classList.add('video-ended');
 
       // 1. Fire hack complete overlay
       fireHackComplete();
@@ -3168,6 +3321,7 @@
             if (hackingLabel) hackingLabel.classList.add('visible');
             // Activate full-screen video background
             document.getElementById('contact-wrapper').classList.add('video-active');
+            document.body.classList.add('video-mode');
             contactVideo.currentTime = 0;
             contactVideo.play().catch(() => { triggerContactReveal(); });
           }
