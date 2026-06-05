@@ -2219,6 +2219,29 @@
     filter: blur(0.5px);
   }
 
+  /* Ocultar títulos, texto y divisores durante el video */
+  body.video-mode #hero,
+  body.video-mode #projects,
+  body.video-mode .section-label,
+  body.video-mode .section-title,
+  body.video-mode .divider:not(#contact-wrapper .divider),
+  body.video-mode .hero-tag,
+  body.video-mode .hero-name,
+  body.video-mode .hero-title,
+  body.video-mode .hero-desc,
+  body.video-mode .hero-cta,
+  body.video-mode .about-text,
+  body.video-mode .about-stats,
+  body.video-mode .skills-grid,
+  body.video-mode .projects-list,
+  body.video-mode .terminal-box,
+  body.video-mode .langs-grid,
+  body.video-mode footer {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.8s ease;
+  }
+
   /* Hover sobre cards fantasma: revelan su contorno con efecto scan */
   body.video-mode .skill-card:hover,
   body.video-mode .project-card:hover,
@@ -2323,22 +2346,48 @@
     opacity: 1;
   }
 
-  /* Cuando el video termina, restaurar todo */
+  /* Cuando el video termina, restaurar todo — !important para ganarle al ghost */
   body.video-mode.video-ended .skill-card,
   body.video-mode.video-ended .project-card,
   body.video-mode.video-ended .lang-chip,
   body.video-mode.video-ended .stat-box {
-    opacity: 1;
-    filter: none;
-    transition: opacity 1.8s ease, filter 1.8s ease, border-color 1.8s ease;
+    opacity: 1 !important;
+    filter: none !important;
+    background: transparent !important;
+    border-color: rgba(252, 227, 0, 0.1) !important;
+    box-shadow: none !important;
+    transition: opacity 1.8s ease, filter 1.8s ease, background 1.8s ease, border-color 1.8s ease !important;
   }
 
   body.video-mode.video-ended .skill-card *,
   body.video-mode.video-ended .project-card *,
   body.video-mode.video-ended .lang-chip *,
   body.video-mode.video-ended .stat-box * {
-    opacity: 1;
-    transition: opacity 1.8s ease;
+    opacity: 1 !important;
+    transition: opacity 1.8s ease !important;
+  }
+
+  /* Restaurar títulos y contenido al terminar el video */
+  body.video-mode.video-ended #hero,
+  body.video-mode.video-ended #projects,
+  body.video-mode.video-ended .section-label,
+  body.video-mode.video-ended .section-title,
+  body.video-mode.video-ended .divider:not(#contact-wrapper .divider),
+  body.video-mode.video-ended .hero-tag,
+  body.video-mode.video-ended .hero-name,
+  body.video-mode.video-ended .hero-title,
+  body.video-mode.video-ended .hero-desc,
+  body.video-mode.video-ended .hero-cta,
+  body.video-mode.video-ended .about-text,
+  body.video-mode.video-ended .about-stats,
+  body.video-mode.video-ended .skills-grid,
+  body.video-mode.video-ended .projects-list,
+  body.video-mode.video-ended .terminal-box,
+  body.video-mode.video-ended .langs-grid,
+  body.video-mode.video-ended footer {
+    opacity: 1 !important;
+    pointer-events: auto !important;
+    transition: opacity 1.5s ease !important;
   }
 
   /* ─── FREELANCE CALLOUT ─── */
@@ -3274,6 +3323,64 @@
       contactVideo.classList.add('ended');
       progressBar.style.transition = '';
       document.body.classList.add('video-ended');
+
+      // Restaurar cards directamente via JS (garantizado, sin depender de CSS cascade)
+      setTimeout(() => {
+        document.querySelectorAll('.skill-card, .project-card, .lang-chip').forEach(el => {
+          el.style.opacity = '1';
+          el.style.filter = 'none';
+          el.style.background = 'transparent';
+          el.style.borderColor = 'rgba(252, 227, 0, 0.1)';
+          el.style.boxShadow = 'none';
+          el.style.transition = 'opacity 1.8s ease, filter 1.8s ease, background 1.8s ease';
+          el.querySelectorAll('*').forEach(child => {
+            child.style.opacity = '1';
+          });
+        });
+        document.querySelectorAll('.stat-box').forEach(el => {
+          el.style.opacity = '1';
+          el.style.filter = 'none';
+          el.style.background = 'rgba(252, 227, 0, 0.015)';
+          el.style.borderColor = 'rgba(252, 227, 0, 0.12)';
+          el.style.boxShadow = 'none';
+          el.style.transition = 'opacity 1.8s ease, filter 1.8s ease, background 1.8s ease';
+          el.querySelectorAll('*').forEach(child => {
+            child.style.opacity = '1';
+          });
+        });
+        // Restaurar títulos y contenido (opacity 0 durante el video)
+        const hiddenEls = document.querySelectorAll(
+          '.section-label, .section-title, .divider:not(#contact-wrapper .divider), ' +
+          '#hero, #projects, .hero-tag, .hero-name, .hero-title, .hero-desc, .hero-cta, ' +
+          '.about-text, .about-stats, .skills-grid, .projects-list, ' +
+          '.terminal-box, .langs-grid, footer'
+        );
+        hiddenEls.forEach(el => {
+          el.style.transition = 'opacity 1.5s ease';
+          el.style.opacity = '1';
+          el.style.pointerEvents = 'auto';
+        });
+
+        // Limpiar estilos inline después de la transición para que hover vuelva a funcionar
+        setTimeout(() => {
+          document.querySelectorAll('.skill-card, .project-card, .lang-chip, .stat-box').forEach(el => {
+            el.style.opacity = '';
+            el.style.filter = '';
+            el.style.background = '';
+            el.style.borderColor = '';
+            el.style.boxShadow = '';
+            el.style.transition = '';
+            el.querySelectorAll('*').forEach(child => {
+              child.style.opacity = '';
+            });
+          });
+          hiddenEls.forEach(el => {
+            el.style.opacity = '';
+            el.style.transition = '';
+            el.style.pointerEvents = '';
+          });
+        }, 2000);
+      }, 100);
 
       // 1. Fire hack complete overlay
       fireHackComplete();
